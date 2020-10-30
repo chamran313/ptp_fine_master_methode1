@@ -264,7 +264,7 @@ int main(void)
 	coarse_flag = 1;
 	tim4_period = (tim4_period_reg+1) * 0.00926;
 	//ptp_synq_interval = (synq_interval + 2 + 1 + (3*f_f_packet_prescaler) + 1+ 2)* tim4_period; // 2 akhar baraye pkt loss
-	ptp_synq_interval = (3+(synq_pkt_number-2)*f_f_packet_prescaler) * tim4_period; //4 for pkt loss
+	ptp_synq_interval = (synq_interval+4+(synq_pkt_number-2)*f_f_packet_prescaler+1) * tim4_period; //4 for pkt loss
 	
 	//ptp_synq_interval = (synq_interval + 2 + 1 + (3*f_f_packet_prescaler) + 1+ 1) * 8; // 1 akhar baraye pkt loss
 	
@@ -531,7 +531,7 @@ void udp_send1( ETH_TimeStamp* timestamp, int32_t ptp_hdr, uint16_t syn_interval
 	//len = sprintf(buf, "a");
 	buf[0] = timestamp->TimeStampLow;
 	buf[1] = timestamp->TimeStampHigh;
-	if(ptphdr==1)	
+	if(ptphdr==4)	
 		{
 		syn_int_copy = syn_interval << 8;
 		}
