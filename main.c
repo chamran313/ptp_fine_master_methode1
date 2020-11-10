@@ -216,6 +216,10 @@ if(htim->Instance == TIM4)
 			#endif
 	
 	}
+	if(htim->Instance==TIM2)
+		{
+			HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_3);
+		}
 
 }
 /* USER CODE END 0 */
@@ -455,6 +459,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	
+	/*Configure GPIO pin : PG2 */
+  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
 }
 
@@ -693,6 +704,18 @@ void ETH_EnablePTPTimeStampAddend(void)
 {
   /* Enable the PTP block update with the Time Stamp Addend register value */
   ETH->PTPTSCR |= ETH_PTPTSCR_TSARU;    
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void load_target_time(ETH_TimeStamp *tg_time)
+{
+	ETH->PTPTTHR = tg_time->TimeStampHigh;
+	ETH->PTPTTLR = tg_time->TimeStampLow;
+	
+	ETH->MACIMR &= 0XFFFFFDFF; // unmask timestamp trigger interrupt
+	
+	ETH->PTPTSCR |= 0x00000010 ; //Time stamp interrupt trigger enable
+
 }
 /* USER CODE END 4 */
 
