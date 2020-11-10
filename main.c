@@ -98,6 +98,7 @@ uint8_t tim4_period;
 extern ETH_TimeStamp tx_ts;
 extern ETH_TimeStamp rx_ts;
 ETH_TimeStamp tx_ts_array[6];
+ETH_TimeStamp target_time;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -118,6 +119,7 @@ void udp_send1( ETH_TimeStamp* timestamp, int32_t ptp_hdr, uint16_t syn_interval
 //uint8_t Master_synq_process( uint8_t state);
 void ETH_SetPTPTimeStampAddend(uint32_t Value);
 void ETH_EnablePTPTimeStampAddend(void);
+void load_target_time(ETH_TimeStamp *tg_time);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -263,15 +265,18 @@ int main(void)
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim4);
+	HAL_TIM_Base_Start_IT(&htim2);
 	
 	//synq_interval = 1;
 	coarse_flag = 1;
 	tim4_period = (tim4_period_reg+1) * 0.00926;
 	//ptp_synq_interval = (synq_interval + 2 + 1 + (3*f_f_packet_prescaler) + 1+ 2)* tim4_period; // 2 akhar baraye pkt loss
 	ptp_synq_interval = (synq_interval+4+(synq_pkt_number-2)*f_f_packet_prescaler+1) * tim4_period; //4 for pkt loss
-	
+
 	//ptp_synq_interval = (synq_interval + 2 + 1 + (3*f_f_packet_prescaler) + 1+ 1) * 8; // 1 akhar baraye pkt loss
-	
+	target_time.TimeStampHigh = 50;
+	target_time.TimeStampLow = 0;
+	load_target_time(&target_time);
   /* USER CODE END 2 */
 	
 	
@@ -363,7 +368,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 10;
+  htim2.Init.Period = 1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
